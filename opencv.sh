@@ -5,7 +5,7 @@ rm -rf opencv.tar.gz opencv-* opencv
 apk add zlib libjpeg-turbo libwebp libpng libtiff openjpeg gstreamer ffmpeg v4l-utils
 
 apk add zlib-devel libjpeg-turbo-devel libwebp-devel libpng-devel libtiff-devel openjpeg-devel gstreamer-devel ffmpeg-devel gst-plugins-base-devel v4l-utils-devel vulkan-tools
-apk add clang lld cmake ninja python
+apk add curl clang lld cmake ninja python
 
 #curl -L https://github.com/opencv/opencv/archive/refs/tags/4.7.0.tar.gz -o opencv.tar.gz
 #tar -xf opencv.tar.gz

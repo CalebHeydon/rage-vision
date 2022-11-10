@@ -1,3 +1,5 @@
 *.tar.*
 opencv-*
 opencv
+apriltag-*
+apriltag
