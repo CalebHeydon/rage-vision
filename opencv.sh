@@ -61,3 +61,5 @@ cmake -G Ninja -B build \
 cd build
 ninja
 ninja install
+
+rm -rf opencv.tar.gz opencv-* opencv
