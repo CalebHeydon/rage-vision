@@ -8,6 +8,7 @@ All rights reserved.
 #include <cstdlib>
 #include <vector>
 
+#include "Calibration.hxx"
 #include "RageVision.hxx"
 
 int main(int argc, char **argv)
@@ -18,23 +19,42 @@ int main(int argc, char **argv)
 
     if (argc < 1)
     {
-        std::cerr << "usage: RageVision destIp [mjpegPort] [cameraId...]\n";
+        std::cerr << "usage: RageVision destIp [mjpegPort] [syncPort] [cameraId...]\n";
+        std::cerr << "       Calibrate [mjpegPort]\n";
         return -1;
     }
-    else if (argc < 2)
+
+    std::string name{argv[0]};
+
+    if (name.find("Calibrate") != -1)
     {
-        std::cerr << "usage: " << argv[0] << " destIp [mjpegPort] [cameraId...]\n";
+        int mjpegPort = 5800;
+
+        if (argc > 1)
+            mjpegPort = atoi(argv[1]);
+
+        Calibration calibration{mjpegPort};
+        return calibration.run();
+    }
+
+    if (argc < 2)
+    {
+        std::cerr << "usage: " << argv[0] << " destIp [mjpegPort] [syncPort] [cameraId...]\n";
         return -1;
     }
 
     std::string ip{argv[1]};
     int mjpegPort = 5800;
+    int syncPort = 5801;
     std::vector<int> cameras;
 
     if (argc > 2)
         mjpegPort = atoi(argv[2]);
 
-    for (int i = 3; i < argc; i++)
+    if (argc > 3)
+        syncPort = atoi(argv[3]);
+
+    for (int i = 4; i < argc; i++)
     {
         int camera = atoi(argv[i]);
         bool exists = false;
