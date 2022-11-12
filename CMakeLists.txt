@@ -5,7 +5,10 @@ set(CMAKE_CXX_STANDARD 11)
 
 find_package(OpenCV REQUIRED)
 
-include_directories("include")
+find_package(PkgConfig REQUIRED)
+pkg_search_module(apriltag REQUIRED apriltag)
+
+include_directories("include" ${OpenCV_INCLUDE_DIRS} ${apriltag_INCLUDE_DIRS})
 file(GLOB SOURCES "src/*.cxx")
 add_executable(RageVision ${SOURCES})
-target_link_libraries(RageVision opencv_core)
+target_link_libraries(RageVision ${OpenCV_LIBS} ${apriltag_LIBRARIES})

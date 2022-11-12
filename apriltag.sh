@@ -21,5 +21,3 @@ cmake -G Ninja -B build \
 cd build
 ninja
 ninja install
-
-rm -rf apriltag.tar.gz apriltag-* apriltag
