@@ -8,7 +8,7 @@ All rights reserved.
 class Calibration
 {
 public:
-    Calibration(int mjpegPort);
+    Calibration(int camera, int mjpegPort);
 
     int run();
 };

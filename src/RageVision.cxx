@@ -7,7 +7,7 @@ All rights reserved.
 
 #include <string>
 
-const std::string RageVision::kVersion = "0.1";
+const std::string RageVision::kVersion = "v0.1.0";
 
 RageVision::RageVision(std::string ip, int mjpegPort, std::vector<int> cameras)
 {

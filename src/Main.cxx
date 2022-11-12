@@ -13,14 +13,14 @@ All rights reserved.
 
 int main(int argc, char **argv)
 {
-    std::cout << "RageVision v" << RageVision::kVersion << "\n";
+    std::cout << "RageVision " << RageVision::kVersion << "\n";
     std::cout << "Copyright (c) 2022, Caleb Heydon\n";
     std::cout << "All rights reserved.\n\n";
 
     if (argc < 1)
     {
-        std::cerr << "usage: RageVision destIp [mjpegPort] [syncPort] [cameraId...]\n";
-        std::cerr << "       Calibrate [mjpegPort]\n";
+        std::cerr << "usage: RageVision destIp [mjpegPort] [syncPort] [camera...]\n";
+        std::cerr << "       Calibrate camera [mjpegPort]\n";
         return -1;
     }
 
@@ -28,24 +28,34 @@ int main(int argc, char **argv)
 
     if (name.find("Calibrate") != -1)
     {
-        int mjpegPort = 5800;
+        int camera = 0;
+        int mjpegPort = RageVision::kDefaultMjpegPort;
+
+        if (argc < 2)
+        {
+            std::cerr << "usage: " << argv[0] << " camera [mjpegPort]\n";
+            return -1;
+        }
 
         if (argc > 1)
-            mjpegPort = atoi(argv[1]);
+            camera = atoi(argv[1]);
 
-        Calibration calibration{mjpegPort};
+        if (argc > 2)
+            mjpegPort = atoi(argv[2]);
+
+        Calibration calibration{camera, mjpegPort};
         return calibration.run();
     }
 
     if (argc < 2)
     {
-        std::cerr << "usage: " << argv[0] << " destIp [mjpegPort] [syncPort] [cameraId...]\n";
+        std::cerr << "usage: " << argv[0] << " destIp [mjpegPort] [syncPort] [camera...]\n";
         return -1;
     }
 
     std::string ip{argv[1]};
-    int mjpegPort = 5800;
-    int syncPort = 5801;
+    int mjpegPort = RageVision::kDefaultMjpegPort;
+    int syncPort = RageVision::kDefaultSyncPort;
     std::vector<int> cameras;
 
     if (argc > 2)

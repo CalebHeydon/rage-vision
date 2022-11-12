@@ -5,7 +5,7 @@ All rights reserved.
 
 #include "Calibration.hxx"
 
-Calibration::Calibration(int mjpegPort)
+Calibration::Calibration(int camera, int mjpegPort)
 {
 }
 
