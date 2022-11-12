@@ -3,3 +3,5 @@ opencv-*
 opencv
 apriltag-*
 apriltag
+.vscode
+build
