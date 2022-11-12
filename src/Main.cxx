@@ -20,7 +20,7 @@ int main(int argc, char **argv)
     if (argc < 1)
     {
         std::cerr << "usage: RageVision destIp [mjpegPort] [syncPort] [camera...]\n";
-        std::cerr << "       Calibrate camera [mjpegPort]\n";
+        std::cerr << "       Calibrate width height [mjpegPort] [camera]\n";
         return -1;
     }
 
@@ -28,22 +28,26 @@ int main(int argc, char **argv)
 
     if (name.find("Calibrate") != -1)
     {
-        int camera = 0;
+        int width, height;
         int mjpegPort = RageVision::kDefaultMjpegPort;
+        int camera = 0;
 
-        if (argc < 2)
+        if (argc < 3)
         {
-            std::cerr << "usage: " << argv[0] << " camera [mjpegPort]\n";
+            std::cerr << "usage: " << argv[0] << " width height [mjpegPort] [camera]\n";
             return -1;
         }
 
-        if (argc > 1)
-            camera = atoi(argv[1]);
+        width = atoi(argv[1]);
+        height = atoi(argv[2]);
 
-        if (argc > 2)
-            mjpegPort = atoi(argv[2]);
+        if (argc > 3)
+            mjpegPort = atoi(argv[1]);
 
-        Calibration calibration{camera, mjpegPort};
+        if (argc > 4)
+            camera = atoi(argv[2]);
+
+        Calibration calibration{camera, width, height, mjpegPort};
         return calibration.run();
     }
 
