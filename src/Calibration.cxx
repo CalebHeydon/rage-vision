@@ -73,7 +73,7 @@ int Calibration::run()
         objectPoints.push_back(points);
         imagePoints.push_back(corners);
 
-        double error = cv::calibrateCamera(objectPoints, imagePoints, mSize, cameraMatrix, distCoeffs, rotations, translations, cv::CALIB_FIX_ASPECT_RATIO);
+        double error = cv::calibrateCamera(objectPoints, imagePoints, mSize, cameraMatrix, distCoeffs, rotations, translations, cv::CALIB_FIX_ASPECT_RATIO | cv::CALIB_ZERO_TANGENT_DIST);
 
         std::cout << "Ok (error = " << error << ")\n";
     }
