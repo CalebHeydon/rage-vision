@@ -5,22 +5,27 @@ All rights reserved.
 
 #include "Calibration.hxx"
 
+#include <opencv2/opencv.hpp>
+#include <memory>
 #include <thread>
 #include <vector>
 #include <iostream>
-#include <opencv2/opencv.hpp>
 #include <sstream>
+
+#include "MjpegServer.hxx"
 
 Calibration::Calibration(int camera, int width, int height, int mjpegPort) : mCamera{camera}
 {
     mCheckerboardSize = cv::Size{width, height};
-    mMjpegPort = mjpegPort;
     mRunning = true;
     mFrameLock = false;
+    mMjpegServer = std::make_shared<MjpegServer>(mjpegPort);
 }
 
 int Calibration::run()
 {
+    mMjpegServer->run();
+
     std::thread thread{[this]
                        {
                            while (mRunning)

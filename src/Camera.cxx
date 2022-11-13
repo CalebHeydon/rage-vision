@@ -6,6 +6,7 @@ All rights reserved.
 #include "Camera.hxx"
 
 #include <iostream>
+#include <cstdlib>
 #include <opencv2/opencv.hpp>
 
 Camera::Camera(int id) : mVideoCapture{id}
