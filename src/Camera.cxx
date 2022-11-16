@@ -8,6 +8,7 @@ All rights reserved.
 #include <iostream>
 #include <cstdlib>
 #include <opencv2/opencv.hpp>
+#include <chrono>
 
 Camera::Camera(int id) : mVideoCapture{id}
 {
@@ -25,8 +26,9 @@ int Camera::id()
     return mId;
 }
 
-void Camera::currentFrame(cv::Mat *frame)
+double Camera::currentFrame(cv::Mat *frame, long startTime)
 {
+    long time;
     while (true)
     {
         if (!mVideoCapture.grab())
@@ -35,9 +37,12 @@ void Camera::currentFrame(cv::Mat *frame)
             continue;
         }
 
+        time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
         mVideoCapture.retrieve(*frame);
         break;
     }
+
+    return (time - startTime) / 1.0e9;
 }
 
 void Camera::release()

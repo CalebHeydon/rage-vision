@@ -145,6 +145,21 @@ void MjpegServer::run()
                                                                 bytesWritten += tmp;
                                                             }
 
+                                                            mCamerasMutex.lock();
+                                                            std::vector<int> cameras = mCameras;
+                                                            mCamerasMutex.unlock();
+
+                                                            bool found = false;
+                                                            for (int i : cameras)
+                                                                if (i == camera)
+                                                                    found = true;
+
+                                                            if (!found)
+                                                            {
+                                                                close(clientFd);
+                                                                return;
+                                                            }
+
                                                             mClientsMutex.lock();
                                                             mClients[camera].push_back(clientFd);
                                                             mClientsMutex.unlock();

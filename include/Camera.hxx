@@ -17,6 +17,6 @@ public:
     Camera(int id);
 
     int id();
-    void currentFrame(cv::Mat *frame);
+    double currentFrame(cv::Mat *frame, long startTime = 0);
     void release();
 };
