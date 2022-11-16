@@ -42,10 +42,10 @@ int main(int argc, char **argv)
         height = atoi(argv[2]);
 
         if (argc > 3)
-            mjpegPort = atoi(argv[1]);
+            mjpegPort = atoi(argv[3]);
 
         if (argc > 4)
-            camera = atoi(argv[2]);
+            camera = atoi(argv[4]);
 
         Calibration calibration{camera, width, height, mjpegPort};
         return calibration.run();

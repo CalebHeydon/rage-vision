@@ -34,6 +34,8 @@ int Calibration::run()
                                    ;
                                mCamera.currentFrame(&mFrame);
                                mFrameLock.store(false, std::memory_order_release);
+
+                               mMjpegServer->sendFrame(mCamera.id(), mFrame);
                            }
                        }};
 
