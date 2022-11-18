@@ -6,10 +6,22 @@ All rights reserved.
 #pragma once
 
 #include <string>
+#include <memory>
 #include <vector>
+#include <opencv2/opencv.hpp>
+
+#include "MjpegServer.hxx"
+#include "Camera.hxx"
 
 class RageVision
 {
+private:
+    std::string mIp;
+    std::shared_ptr<MjpegServer> mMjpegServer;
+    std::vector<std::shared_ptr<Camera>> mCameras;
+
+    bool runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera);
+
 public:
     static const std::string kVersion;
     static const int kHttpBufferSize = 4096;
