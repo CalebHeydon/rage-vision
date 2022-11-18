@@ -12,6 +12,9 @@ class Camera
 private:
     cv::VideoCapture mVideoCapture;
     int mId;
+    bool mCalibrated;
+    cv::Mat mCameraMatrix;
+    cv::Mat mDistCoeffs;
 
 public:
     Camera(int id);
@@ -19,4 +22,7 @@ public:
     int id();
     double currentFrame(cv::Mat *frame, long startTime = 0);
     void release();
+    bool calibrated();
+    cv::Mat cameraMatrix();
+    cv::Mat distCoeffs();
 };

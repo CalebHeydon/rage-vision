@@ -7,18 +7,35 @@ All rights reserved.
 
 #include <iostream>
 #include <cstdlib>
+#include <sstream>
 #include <opencv2/opencv.hpp>
+#include <string>
 #include <chrono>
 
 Camera::Camera(int id) : mVideoCapture{id}
 {
     mId = id;
+    mCalibrated = true;
 
     if (!mVideoCapture.isOpened())
     {
-        std::cerr << "Camera " << id << " not found\n";
+        std::cerr << "Camera " << mId << " not found\n";
         std::exit(-1);
     }
+
+    std::stringstream filename;
+    filename << "./camera" << mId << ".yml";
+    cv::FileStorage file{filename.str(), cv::FileStorage::READ};
+    if (!file.isOpened())
+    {
+        mCalibrated = false;
+        return;
+    }
+
+    file["cameraMatrix"] >> mCameraMatrix;
+    file["distCoeffs"] >> mDistCoeffs;
+
+    file.release();
 }
 
 int Camera::id()
@@ -48,4 +65,19 @@ double Camera::currentFrame(cv::Mat *frame, long startTime)
 void Camera::release()
 {
     mVideoCapture.release();
+}
+
+bool Camera::calibrated()
+{
+    return mCalibrated;
+}
+
+cv::Mat Camera::cameraMatrix()
+{
+    return mCameraMatrix.clone();
+}
+
+cv::Mat Camera::distCoeffs()
+{
+    return mDistCoeffs.clone();
 }

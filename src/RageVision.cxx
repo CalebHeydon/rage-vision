@@ -19,6 +19,14 @@ const std::string RageVision::kVersion = "v0.1.0";
 bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera)
 {
     camera->currentFrame(frame);
+
+    if (camera->calibrated())
+    {
+        cv::Mat undistorted;
+        cv::undistort(*frame, undistorted, camera->cameraMatrix(), camera->distCoeffs());
+        undistorted.copyTo(*frame);
+    }
+
     mMjpegServer->sendFrame(camera->id(), *frame);
 
     return true;
