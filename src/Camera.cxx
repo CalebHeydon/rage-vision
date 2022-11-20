@@ -72,12 +72,12 @@ bool Camera::calibrated()
     return mCalibrated;
 }
 
-cv::Mat Camera::cameraMatrix()
+const cv::Mat Camera::cameraMatrix()
 {
-    return mCameraMatrix.clone();
+    return mCameraMatrix;
 }
 
-cv::Mat Camera::distCoeffs()
+const cv::Mat Camera::distCoeffs()
 {
-    return mDistCoeffs.clone();
+    return mDistCoeffs;
 }

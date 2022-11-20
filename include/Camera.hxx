@@ -23,6 +23,6 @@ public:
     double currentFrame(cv::Mat *frame, long startTime = 0);
     void release();
     bool calibrated();
-    cv::Mat cameraMatrix();
-    cv::Mat distCoeffs();
+    const cv::Mat cameraMatrix();
+    const cv::Mat distCoeffs();
 };
