@@ -25,6 +25,8 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera)
 
     if (camera->calibrated())
     {
+        cv::cvtColor(*frame, *frame, cv::COLOR_BGR2GRAY);
+
         cv::Mat undistorted;
         cv::undistort(*frame, undistorted, camera->cameraMatrix(), camera->distCoeffs());
         undistorted.copyTo(*frame);
@@ -39,7 +41,7 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera)
 
             double error = -1;
 
-            if (tag->hamming < kMinHamming)
+            if (tag->hamming > kMaxHamming)
                 goto PIPELINE_NEXT_TAG;
 
             apriltag_detection_info_t info;
@@ -52,6 +54,10 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera)
 
             apriltag_pose_t pose;
             error = estimate_tag_pose(&info, &pose);
+            std::cout << "id: " << tag->id << ", hamming: " << tag->hamming << ", error: " << error << "\n";
+
+            free(pose.t);
+            free(pose.R);
 
         PIPELINE_NEXT_TAG:
             apriltag_detection_destroy(tag);
@@ -74,6 +80,7 @@ RageVision::RageVision(std::string ip, int mjpegPort, std::vector<int> cameras)
         mCameras.push_back(std::make_shared<Camera>(camera));
 
     mTagDetector = apriltag_detector_create();
+    mTagDetector->nthreads = kTagThreads;
     mTagFamily = tag16h5_create();
     apriltag_detector_add_family(mTagDetector, mTagFamily);
 }

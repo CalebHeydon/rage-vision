@@ -32,8 +32,9 @@ public:
     static const int kMjpegConnectionBacklog = 128;
     static const int kDefaultSyncPort = 5801;
     static const int kDefaultDataPort = 5800;
-    static const int kMinHamming = 4;
+    static const int kMaxHamming = 0;
     static constexpr double kTagSize = 0.206375;
+    static const int kTagThreads = 4;
 
     RageVision(std::string ip, int mjpegPort, std::vector<int> cameras);
     ~RageVision();
