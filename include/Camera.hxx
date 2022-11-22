@@ -13,6 +13,10 @@ private:
     cv::VideoCapture mVideoCapture;
     int mId;
     bool mCalibrated;
+    double mFx;
+    double mFy;
+    double mCx;
+    double mCy;
     cv::Mat mCameraMatrix;
     cv::Mat mDistCoeffs;
 
@@ -23,6 +27,10 @@ public:
     double currentFrame(cv::Mat *frame, long startTime = 0);
     void release();
     bool calibrated();
+    double fx();
+    double fy();
+    double cx();
+    double cy();
     const cv::Mat cameraMatrix();
     const cv::Mat distCoeffs();
 };

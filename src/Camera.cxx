@@ -32,6 +32,10 @@ Camera::Camera(int id) : mVideoCapture{id}
         return;
     }
 
+    file["fx"] >> mFx;
+    file["fy"] >> mFy;
+    file["cx"] >> mCx;
+    file["cy"] >> mCy;
     file["cameraMatrix"] >> mCameraMatrix;
     file["distCoeffs"] >> mDistCoeffs;
 
@@ -70,6 +74,26 @@ void Camera::release()
 bool Camera::calibrated()
 {
     return mCalibrated;
+}
+
+double Camera::fx()
+{
+    return mFx;
+}
+
+double Camera::fy()
+{
+    return mFy;
+}
+
+double Camera::cx()
+{
+    return mCx;
+}
+
+double Camera::cy()
+{
+    return mCy;
 }
 
 const cv::Mat Camera::cameraMatrix()

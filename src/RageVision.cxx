@@ -7,6 +7,9 @@ All rights reserved.
 
 #include <memory>
 #include <opencv2/opencv.hpp>
+#include <apriltag/apriltag.h>
+#include <apriltag/tag16h5.h>
+#include <apriltag/apriltag_pose.h>
 #include <string>
 #include <vector>
 #include <thread>
@@ -25,6 +28,36 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera)
         cv::Mat undistorted;
         cv::undistort(*frame, undistorted, camera->cameraMatrix(), camera->distCoeffs());
         undistorted.copyTo(*frame);
+
+        image_u8_t image = {.width = frame->cols, .height = frame->rows, .stride = frame->cols, .buf = frame->data};
+        zarray_t *tags = apriltag_detector_detect(mTagDetector, &image);
+
+        for (int i = 0; i < tags->size; i++)
+        {
+            apriltag_detection_t *tag;
+            zarray_get(tags, i, &tag);
+
+            double error = -1;
+
+            if (tag->hamming < kMinHamming)
+                goto PIPELINE_NEXT_TAG;
+
+            apriltag_detection_info_t info;
+            info.det = tag;
+            info.tagsize = kTagSize;
+            info.fx = camera->fx();
+            info.fy = camera->fy();
+            info.cx = camera->cx();
+            info.cy = camera->cy();
+
+            apriltag_pose_t pose;
+            error = estimate_tag_pose(&info, &pose);
+
+        PIPELINE_NEXT_TAG:
+            apriltag_detection_destroy(tag);
+        }
+
+        zarray_destroy(tags);
     }
 
     mMjpegServer->sendFrame(camera->id(), *frame);
@@ -39,6 +72,10 @@ RageVision::RageVision(std::string ip, int mjpegPort, std::vector<int> cameras)
 
     for (int camera : cameras)
         mCameras.push_back(std::make_shared<Camera>(camera));
+
+    mTagDetector = apriltag_detector_create();
+    mTagFamily = tag16h5_create();
+    apriltag_detector_add_family(mTagDetector, mTagFamily);
 }
 
 int RageVision::run()
@@ -66,4 +103,10 @@ int RageVision::run()
         ;
 
     return 0;
+}
+
+RageVision::~RageVision()
+{
+    tag16h5_destroy(mTagFamily);
+    apriltag_detector_destroy(mTagDetector);
 }
