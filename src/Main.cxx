@@ -53,13 +53,14 @@ int main(int argc, char **argv)
 
     if (argc < 2)
     {
-        std::cerr << "usage: " << argv[0] << " destIp [mjpegPort] [syncPort] [camera...]\n";
+        std::cerr << "usage: " << argv[0] << " destIp [mjpegPort] [syncPort] [dataPort] [camera...]\n";
         return -1;
     }
 
     std::string ip{argv[1]};
     int mjpegPort = RageVision::kDefaultMjpegPort;
     int syncPort = RageVision::kDefaultSyncPort;
+    int dataPort = RageVision::kDefaultDataPort;
     std::vector<int> cameras;
 
     if (argc > 2)
@@ -68,7 +69,10 @@ int main(int argc, char **argv)
     if (argc > 3)
         syncPort = atoi(argv[3]);
 
-    for (int i = 4; i < argc; i++)
+    if (argc > 4)
+        dataPort = atoi(argv[4]);
+
+    for (int i = 5; i < argc; i++)
     {
         int camera = atoi(argv[i]);
         bool exists = false;

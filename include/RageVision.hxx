@@ -31,6 +31,7 @@ public:
     static const int kDefaultMjpegPort = 5800;
     static const int kMjpegConnectionBacklog = 128;
     static const int kDefaultSyncPort = 5801;
+    static const int kDefaultDataPort = 5800;
     static const int kMinHamming = 4;
     static constexpr double kTagSize = 0.206375;
 
