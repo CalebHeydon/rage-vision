@@ -200,6 +200,11 @@ void MjpegServer::run()
                                         std::vector<int> clients = mClients[camera];
                                         mClientsMutex.unlock();
 
+                                        cv::line(frame, cv::Point{frame.cols / 2 - frame.cols / 10, frame.rows / 2}, cv::Point{frame.cols / 2 - frame.cols / 30, frame.rows / 2}, cv::Scalar{0, 255, 0}, frame.cols / 150);
+                                        cv::line(frame, cv::Point{frame.cols / 2 + frame.cols / 30, frame.rows / 2}, cv::Point{frame.cols / 2 + frame.cols / 10, frame.rows / 2}, cv::Scalar{0, 255, 0}, frame.cols / 150);
+                                        cv::line(frame, cv::Point{frame.cols / 2, frame.rows / 2 - frame.cols / 10}, cv::Point{frame.cols / 2, frame.rows / 2 - frame.cols / 30}, cv::Scalar{0, 255, 0}, frame.cols / 150);
+                                        cv::line(frame, cv::Point{frame.cols / 2, frame.rows / 2 + frame.cols / 30}, cv::Point{frame.cols / 2, frame.rows / 2 + frame.cols / 10}, cv::Scalar{0, 255, 0}, frame.cols / 150);
+
                                         cv::imencode(".jpg", frame, buffer);
 
                                         std::stringstream stringStream;

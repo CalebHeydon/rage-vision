@@ -33,6 +33,7 @@ public:
     static const int kDefaultSyncPort = 5801;
     static const int kDefaultDataPort = 5800;
     static const int kMaxHamming = 0;
+    static constexpr double kMaxError = 0.001;
     static constexpr double kTagSize = 0.206375;
     static const int kTagThreads = 4;
 

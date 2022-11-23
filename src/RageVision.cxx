@@ -21,17 +21,18 @@ const std::string RageVision::kVersion = "v0.1.0";
 
 bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera)
 {
-    camera->currentFrame(frame);
+    double frameTimestamp = camera->currentFrame(frame);
 
     if (camera->calibrated())
     {
-        cv::cvtColor(*frame, *frame, cv::COLOR_BGR2GRAY);
+        cv::Mat gray;
+        cv::cvtColor(*frame, gray, cv::COLOR_BGR2GRAY);
 
         cv::Mat undistorted;
-        cv::undistort(*frame, undistorted, camera->cameraMatrix(), camera->distCoeffs());
-        undistorted.copyTo(*frame);
+        cv::undistort(gray, undistorted, camera->cameraMatrix(), camera->distCoeffs());
+        undistorted.copyTo(gray);
 
-        image_u8_t image = {.width = frame->cols, .height = frame->rows, .stride = frame->cols, .buf = frame->data};
+        image_u8_t image = {.width = gray.cols, .height = gray.rows, .stride = gray.cols, .buf = gray.data};
         zarray_t *tags = apriltag_detector_detect(mTagDetector, &image);
 
         for (int i = 0; i < tags->size; i++)
@@ -54,7 +55,11 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera)
 
             apriltag_pose_t pose;
             error = estimate_tag_pose(&info, &pose);
-            std::cout << "id: " << tag->id << ", hamming: " << tag->hamming << ", error: " << error << "\n";
+
+            if (error <= kMaxError)
+            {
+                std::cout << "id: " << tag->id << ", hamming: " << tag->hamming << ", error: " << error << ", (" << pose.t->data[0] << ", " << pose.t->data[1] << ", " << pose.t->data[2] << ")\n";
+            }
 
             free(pose.t);
             free(pose.R);
