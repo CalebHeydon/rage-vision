@@ -12,6 +12,9 @@ All rights reserved.
 #include <apriltag/apriltag_pose.h>
 #include <string>
 #include <vector>
+#include <chrono>
+#include <algorithm>
+#include <cmath>
 #include <thread>
 
 #include "Camera.hxx"
@@ -19,18 +22,37 @@ All rights reserved.
 
 const std::string RageVision::kVersion = "v0.1.0";
 
-bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera)
+bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std::vector<double> *timestamps)
 {
-    double frameTimestamp = camera->currentFrame(frame);
+    double timestamp = camera->currentFrame(frame, mSyncTime);
+    double fps = 0;
+
+    if (timestamps->size() > 1)
+    {
+        if (timestamps->at(0) < timestamp - 1)
+        {
+            int i;
+            for (i = 0; i < timestamps->size() && timestamps->at(i) < timestamp - 1; i++)
+                ;
+
+            for (int j = 0; j < i; j++)
+                timestamps->erase(timestamps->begin() + j);
+        }
+
+        double timeElapsed = timestamps->at(timestamps->size() - 1) - timestamps->at(0);
+        fps = timestamps->size() / timeElapsed;
+    }
+
+    timestamps->push_back(timestamp);
 
     if (camera->calibrated())
     {
+        cv::Mat undistorted;
+        cv::undistort(*frame, undistorted, camera->cameraMatrix(), camera->distCoeffs());
+        undistorted.copyTo(*frame);
+
         cv::Mat gray;
         cv::cvtColor(*frame, gray, cv::COLOR_BGR2GRAY);
-
-        cv::Mat undistorted;
-        cv::undistort(gray, undistorted, camera->cameraMatrix(), camera->distCoeffs());
-        undistorted.copyTo(gray);
 
         image_u8_t image = {.width = gray.cols, .height = gray.rows, .stride = gray.cols, .buf = gray.data};
         zarray_t *tags = apriltag_detector_detect(mTagDetector, &image);
@@ -58,7 +80,48 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera)
 
             if (error <= kMaxError)
             {
-                std::cout << "id: " << tag->id << ", hamming: " << tag->hamming << ", error: " << error << ", (" << pose.t->data[0] << ", " << pose.t->data[1] << ", " << pose.t->data[2] << ")\n";
+                std::cout << "fps: " << fps << ", id: " << tag->id << ", (" << pose.t->data[0] << ", " << pose.t->data[1] << ", " << pose.t->data[2] << ")\n";
+
+                int thickness = std::max(frame->rows / 200, 1);
+                cv::line(*frame, cv::Point{(int)tag->p[0][0], (int)tag->p[0][1]}, cv::Point{(int)tag->p[1][0], (int)tag->p[1][1]}, cv::Scalar{0, 255, 0}, thickness);
+                cv::line(*frame, cv::Point{(int)tag->p[1][0], (int)tag->p[1][1]}, cv::Point{(int)tag->p[2][0], (int)tag->p[2][1]}, cv::Scalar{0, 255, 0}, thickness);
+                cv::line(*frame, cv::Point{(int)tag->p[2][0], (int)tag->p[2][1]}, cv::Point{(int)tag->p[3][0], (int)tag->p[3][1]}, cv::Scalar{0, 255, 0}, thickness);
+                cv::line(*frame, cv::Point{(int)tag->p[3][0], (int)tag->p[3][1]}, cv::Point{(int)tag->p[0][0], (int)tag->p[0][1]}, cv::Scalar{0, 255, 0}, thickness);
+
+                int minX = frame->cols - 1, minY = frame->rows - 1, maxX = 0, maxY = 0;
+                for (int i = 0; i < 4; i++)
+                {
+                    if (tag->p[i][0] < minX)
+                        minX = tag->p[i][0];
+                    if (tag->p[i][0] > maxX)
+                        maxX = tag->p[i][0];
+                    if (tag->p[i][1] < minY)
+                        minY = tag->p[i][1];
+                    if (tag->p[i][1] > maxY)
+                        maxY = tag->p[i][1];
+                }
+
+                thickness = std::max(frame->rows / 150, 1);
+                cv::rectangle(*frame, cv::Rect{cv::Point{minX, minY}, cv::Point{maxX, maxY}}, cv::Scalar{0, 255, 0}, thickness);
+
+                double range = std::sqrt(pose.t->data[0] * pose.t->data[0] + pose.t->data[1] * pose.t->data[1] + pose.t->data[2] * pose.t->data[2]);
+
+                thickness = 2;
+                int height = std::max(frame->rows / 75, 10);
+                double scale;
+                for (scale = 0; cv::getTextSize("", cv::FONT_HERSHEY_PLAIN, scale, thickness, nullptr).height < height; scale += 0.1)
+                    ;
+                int textX = minX, textY = minY - height;
+
+                std::stringstream rangeText;
+                rangeText << range;
+                cv::putText(*frame, rangeText.str(), cv::Point{textX, textY}, cv::FONT_HERSHEY_PLAIN, scale, cv::Scalar{0, 255, 0}, thickness);
+
+                textY = maxY + height * 2;
+
+                std::stringstream idText;
+                idText << tag->id;
+                cv::putText(*frame, idText.str(), cv::Point{textX, textY}, cv::FONT_HERSHEY_PLAIN, scale, cv::Scalar{0, 255, 0}, thickness);
             }
 
             free(pose.t);
@@ -70,6 +133,17 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera)
 
         zarray_destroy(tags);
     }
+
+    int thickness = 2;
+    int height = std::max(frame->rows / 75, 10);
+    double scale;
+    for (scale = 0; cv::getTextSize("", cv::FONT_HERSHEY_PLAIN, scale, thickness, nullptr).height < height; scale += 0.1)
+        ;
+    int textX = height, textY = frame->rows - height;
+
+    std::stringstream fpsText;
+    fpsText << fps;
+    cv::putText(*frame, fpsText.str(), cv::Point{textX, textY}, cv::FONT_HERSHEY_PLAIN, scale, cv::Scalar{0, 255, 0}, thickness);
 
     mMjpegServer->sendFrame(camera->id(), *frame);
 
@@ -88,6 +162,14 @@ RageVision::RageVision(std::string ip, int mjpegPort, std::vector<int> cameras)
     mTagDetector->nthreads = kTagThreads;
     mTagFamily = tag16h5_create();
     apriltag_detector_add_family(mTagDetector, mTagFamily);
+
+    mSyncTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+}
+
+RageVision::~RageVision()
+{
+    tag16h5_destroy(mTagFamily);
+    apriltag_detector_destroy(mTagDetector);
 }
 
 int RageVision::run()
@@ -101,8 +183,9 @@ int RageVision::run()
         std::thread thread{[this, camera]
                            {
                                cv::Mat frame;
+                               std::vector<double> timestamps;
 
-                               while (runPipeline(&frame, camera))
+                               while (runPipeline(&frame, camera, &timestamps))
                                    ;
                            }};
         thread.detach();
@@ -110,15 +193,10 @@ int RageVision::run()
 
     std::shared_ptr<Camera> camera = mCameras[0];
     cv::Mat frame;
+    std::vector<double> timestamps;
 
-    while (runPipeline(&frame, camera))
+    while (runPipeline(&frame, camera, &timestamps))
         ;
 
     return 0;
-}
-
-RageVision::~RageVision()
-{
-    tag16h5_destroy(mTagFamily);
-    apriltag_detector_destroy(mTagDetector);
 }

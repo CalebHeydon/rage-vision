@@ -17,6 +17,7 @@ All rights reserved.
 #include <string>
 #include <cstddef>
 #include <cstdlib>
+#include <algorithm>
 #include <opencv2/opencv.hpp>
 #include <sstream>
 
@@ -200,10 +201,11 @@ void MjpegServer::run()
                                         std::vector<int> clients = mClients[camera];
                                         mClientsMutex.unlock();
 
-                                        cv::line(frame, cv::Point{frame.cols / 2 - frame.cols / 10, frame.rows / 2}, cv::Point{frame.cols / 2 - frame.cols / 30, frame.rows / 2}, cv::Scalar{0, 255, 0}, frame.cols / 150);
-                                        cv::line(frame, cv::Point{frame.cols / 2 + frame.cols / 30, frame.rows / 2}, cv::Point{frame.cols / 2 + frame.cols / 10, frame.rows / 2}, cv::Scalar{0, 255, 0}, frame.cols / 150);
-                                        cv::line(frame, cv::Point{frame.cols / 2, frame.rows / 2 - frame.cols / 10}, cv::Point{frame.cols / 2, frame.rows / 2 - frame.cols / 30}, cv::Scalar{0, 255, 0}, frame.cols / 150);
-                                        cv::line(frame, cv::Point{frame.cols / 2, frame.rows / 2 + frame.cols / 30}, cv::Point{frame.cols / 2, frame.rows / 2 + frame.cols / 10}, cv::Scalar{0, 255, 0}, frame.cols / 150);
+                                        int thickness = std::max(frame.rows / 150, 1);
+                                        cv::line(frame, cv::Point{frame.cols / 2 - frame.cols / 10, frame.rows / 2}, cv::Point{frame.cols / 2 - frame.cols / 30, frame.rows / 2}, cv::Scalar{0, 255, 0}, thickness);
+                                        cv::line(frame, cv::Point{frame.cols / 2 + frame.cols / 30, frame.rows / 2}, cv::Point{frame.cols / 2 + frame.cols / 10, frame.rows / 2}, cv::Scalar{0, 255, 0}, thickness);
+                                        cv::line(frame, cv::Point{frame.cols / 2, frame.rows / 2 - frame.cols / 10}, cv::Point{frame.cols / 2, frame.rows / 2 - frame.cols / 30}, cv::Scalar{0, 255, 0}, thickness);
+                                        cv::line(frame, cv::Point{frame.cols / 2, frame.rows / 2 + frame.cols / 30}, cv::Point{frame.cols / 2, frame.rows / 2 + frame.cols / 10}, cv::Scalar{0, 255, 0}, thickness);
 
                                         cv::imencode(".jpg", frame, buffer);
 

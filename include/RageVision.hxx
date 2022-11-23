@@ -22,8 +22,9 @@ private:
     std::vector<std::shared_ptr<Camera>> mCameras;
     apriltag_detector_t *mTagDetector;
     apriltag_family_t *mTagFamily;
+    long mSyncTime;
 
-    bool runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera);
+    bool runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std::vector<double> *timestamps);
 
 public:
     static const std::string kVersion;
