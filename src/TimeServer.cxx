@@ -79,12 +79,13 @@ void TimeServer::run()
                                }
                                memset(buffer, 0, RageVision::kTimeBufferSize);
 
-                               long time;
+                               long time = -1;
                                int bytesRead = 0;
                                while (bytesRead < RageVision::kTimeBufferSize - 1 && buffer[bytesRead == 0 ? 0 : bytesRead - 1] != '\n')
                                {
                                    int tmp = read(clientFd, buffer + bytesRead, RageVision::kTimeBufferSize - 1 - bytesRead);
-                                   time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+                                   if (time == -1)
+                                       time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
                                    if (tmp < 0)
                                    {
