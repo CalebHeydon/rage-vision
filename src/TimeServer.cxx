@@ -73,7 +73,7 @@ void TimeServer::run()
                                char buffer;
                                while (result < 1)
                                {
-                                   result = read(clientFd, &buffer, 1);
+                                   result = read(clientFd, &buffer, sizeof(char));
                                    if (result < 0)
                                    {
                                        close(clientFd);
