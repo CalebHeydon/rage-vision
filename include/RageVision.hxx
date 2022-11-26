@@ -42,7 +42,7 @@ public:
     static constexpr double kTagSize = 0.206375;
     static const int kTagThreads = 4;
 
-    RageVision(std::string ip, int mjpegPort, std::vector<int> cameras);
+    RageVision(std::string ip, int mjpegPort, int syncPort, int dataPort, std::vector<int> cameras);
     ~RageVision();
 
     int run();

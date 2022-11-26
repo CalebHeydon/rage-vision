@@ -83,7 +83,9 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std
 
             if (error <= kMaxError)
             {
+#ifndef NDEBUG
                 std::cout << "fps: " << fps << ", id: " << tag->id << ", (" << pose.t->data[0] << ", " << pose.t->data[1] << ", " << pose.t->data[2] << ")\n";
+#endif
 
                 int thickness = std::max(frame->rows / 200, 1);
                 cv::line(*frame, cv::Point{(int)tag->p[0][0], (int)tag->p[0][1]}, cv::Point{(int)tag->p[1][0], (int)tag->p[1][1]}, cv::Scalar{0, 255, 0}, thickness);
@@ -153,7 +155,7 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std
     return true;
 }
 
-RageVision::RageVision(std::string ip, int mjpegPort, std::vector<int> cameras)
+RageVision::RageVision(std::string ip, int mjpegPort, int syncPort, int dataPort, std::vector<int> cameras)
 {
     mIp = ip;
     mMjpegServer = std::make_shared<MjpegServer>(mjpegPort);
@@ -167,7 +169,7 @@ RageVision::RageVision(std::string ip, int mjpegPort, std::vector<int> cameras)
     apriltag_detector_add_family(mTagDetector, mTagFamily);
 
     mSyncTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    mTimeServer = std::make_shared<TimeServer>(kDefaultTimePort, &mSyncTime, &mSyncTimeMutex);
+    mTimeServer = std::make_shared<TimeServer>(syncPort, &mSyncTime, &mSyncTimeMutex);
 }
 
 RageVision::~RageVision()

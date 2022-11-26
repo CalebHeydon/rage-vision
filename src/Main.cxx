@@ -93,6 +93,6 @@ int main(int argc, char **argv)
     if (cameras.size() == 0)
         cameras.push_back(0);
 
-    RageVision rageVision{ip, mjpegPort, cameras};
+    RageVision rageVision{ip, mjpegPort, syncPort, dataPort, cameras};
     return rageVision.run();
 }
