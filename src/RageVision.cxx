@@ -19,12 +19,15 @@ All rights reserved.
 
 #include "Camera.hxx"
 #include "MjpegServer.hxx"
+#include "TimeServer.hxx"
 
 const std::string RageVision::kVersion = "v0.1.0";
 
 bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std::vector<double> *timestamps)
 {
+    mSyncTimeMutex.lock();
     double timestamp = camera->currentFrame(frame, mSyncTime);
+    mSyncTimeMutex.unlock();
     double fps = 0;
 
     if (timestamps->size() > 1)
@@ -35,7 +38,7 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std
             for (i = 0; i < timestamps->size() && timestamps->at(i) < timestamp - 1; i++)
                 ;
 
-            for (int j = 0; j < i; j++)
+            for (int j = 0; j < i - 1; j++)
                 timestamps->erase(timestamps->begin() + j);
         }
 
@@ -164,6 +167,7 @@ RageVision::RageVision(std::string ip, int mjpegPort, std::vector<int> cameras)
     apriltag_detector_add_family(mTagDetector, mTagFamily);
 
     mSyncTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    mTimeServer = std::make_shared<TimeServer>(kDefaultTimePort, &mSyncTime, &mSyncTimeMutex);
 }
 
 RageVision::~RageVision()
@@ -175,6 +179,7 @@ RageVision::~RageVision()
 int RageVision::run()
 {
     mMjpegServer->run();
+    mTimeServer->run();
 
     for (int i = 1; i < mCameras.size(); i++)
     {

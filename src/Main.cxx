@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 
     std::string ip{argv[1]};
     int mjpegPort = RageVision::kDefaultMjpegPort;
-    int syncPort = RageVision::kDefaultSyncPort;
+    int syncPort = RageVision::kDefaultTimePort;
     int dataPort = RageVision::kDefaultDataPort;
     std::vector<int> cameras;
 
