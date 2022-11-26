@@ -13,6 +13,7 @@ All rights reserved.
 #include <thread>
 #include <cstdlib>
 #include <chrono>
+#include <string>
 
 #include "RageVision.hxx"
 
@@ -69,24 +70,41 @@ void TimeServer::run()
                                if (clientFd == -1)
                                    continue;
 
-                               int result = 0;
-                               char buffer;
-                               while (result < 1)
+                               char *buffer = new char[RageVision::kTimeBufferSize];
+                               if (!buffer)
                                {
-                                   result = read(clientFd, &buffer, sizeof(char));
-                                   if (result < 0)
-                                   {
-                                       close(clientFd);
-                                       break;
-                                   }
+                                   std::cerr << "Out of memory\n";
+                                   close(clientFd);
+                                   return;
                                }
-                               if (result < 0)
-                                   break;
+                               memset(buffer, 0, RageVision::kTimeBufferSize);
 
-                               long time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+                               long time;
+                               int bytesRead = 0;
+                               while (bytesRead < RageVision::kTimeBufferSize - 1 && buffer[bytesRead == 0 ? 0 : bytesRead - 1] != '\n')
+                               {
+                                   int tmp = read(clientFd, buffer + bytesRead, RageVision::kTimeBufferSize - 1 - bytesRead);
+                                   time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+
+                                   if (tmp < 0)
+                                   {
+                                       delete[] buffer;
+                                       close(clientFd);
+                                       return;
+                                   }
+                                   bytesRead += tmp;
+
+                                   if (tmp < 1)
+                                       break;
+                               }
+
+                               std::string request{buffer};
+                               delete[] buffer;
+
+                               double offset = atof(request.c_str());
 
                                mMutex->lock();
-                               *mTime = time;
+                               *mTime = time - offset * 1e9;
                                mMutex->unlock();
 
                                close(clientFd);
