@@ -50,10 +50,6 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std
 
     if (camera->calibrated())
     {
-        cv::Mat undistorted;
-        cv::undistort(*frame, undistorted, camera->cameraMatrix(), camera->distCoeffs());
-        undistorted.copyTo(*frame);
-
         cv::Mat gray;
         cv::cvtColor(*frame, gray, cv::COLOR_BGR2GRAY);
 

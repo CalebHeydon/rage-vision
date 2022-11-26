@@ -40,26 +40,6 @@ int Calibration::run()
                            }
                        }};
 
-    std::string tmp;
-
-    std::cout << "Enter fx in pixels: ";
-    std::cin >> tmp;
-    double fx = std::atof(tmp.c_str());
-
-    std::cout << "Enter fy in pixels: ";
-    std::cin >> tmp;
-    double fy = std::atof(tmp.c_str());
-
-    std::cout << "Enter cx in pixels: ";
-    std::cin >> tmp;
-    double cx = std::atof(tmp.c_str());
-
-    std::cout << "Enter cy in pixels: ";
-    std::cin >> tmp;
-    double cy = std::atof(tmp.c_str());
-
-    std::cin.get();
-
     // See https://learnopencv.com/camera-calibration-using-opencv/
     // and https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
 
@@ -120,10 +100,6 @@ int Calibration::run()
     std::stringstream filename;
     filename << "./camera" << mCamera.id() << ".yml";
     cv::FileStorage file{filename.str(), cv::FileStorage::WRITE};
-    file << "fx" << fx;
-    file << "fy" << fy;
-    file << "cx" << cx;
-    file << "cy" << cy;
     file << "cameraMatrix" << optimalCameraMatrix;
     file << "distCoeffs" << distCoeffs;
     file.release();

@@ -13,10 +13,6 @@ private:
     cv::VideoCapture mVideoCapture;
     int mId;
     bool mCalibrated;
-    double mFx;
-    double mFy;
-    double mCx;
-    double mCy;
     cv::Mat mCameraMatrix;
     cv::Mat mDistCoeffs;
 
