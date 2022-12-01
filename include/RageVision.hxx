@@ -39,7 +39,7 @@ public:
     static const int kDefaultDataPort = 5800;
     static const int kMaxHamming = 0;
     static constexpr double kMaxError = 0.001;
-    static constexpr double kTagSize = 0.206375;
+    static constexpr double kTagSize = 0.1524;
     static const int kTagThreads = 4;
     static constexpr float kTagDecimate = 0;
     static const int kTimeBufferSize = 2048;
