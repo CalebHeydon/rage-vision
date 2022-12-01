@@ -161,6 +161,7 @@ RageVision::RageVision(std::string ip, int mjpegPort, int syncPort, int dataPort
 
     mTagDetector = apriltag_detector_create();
     mTagDetector->nthreads = kTagThreads;
+    mTagDetector->quad_decimate = kTagDecimate;
     mTagFamily = tag16h5_create();
     apriltag_detector_add_family(mTagDetector, mTagFamily);
 
