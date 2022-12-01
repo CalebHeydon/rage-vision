@@ -50,6 +50,8 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std
 
     if (camera->calibrated())
     {
+        double startTime = std::chrono::high_resolution_clock::now().time_since_epoch().count() / 1.0e9;
+
         cv::Mat gray;
         cv::cvtColor(*frame, gray, cv::COLOR_BGR2GRAY);
 
@@ -79,8 +81,12 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std
 
             if (error <= kMaxError)
             {
+                double endTime = std::chrono::high_resolution_clock::now().time_since_epoch().count() / 1.0e9;
+                double latency = endTime - (timestamp + mSyncTime / 1.0e9);
+                double processingLatency = endTime - startTime;
+
 #ifndef NDEBUG
-                std::cout << "fps: " << fps << ", id: " << tag->id << ", (" << pose.t->data[0] << ", " << pose.t->data[1] << ", " << pose.t->data[2] << ")\n";
+                std::cout << "fps: " << fps << ", latency: " << latency << ", processingLatency: " << processingLatency << ", id: " << tag->id << ", (" << pose.t->data[0] << ", " << pose.t->data[1] << ", " << pose.t->data[2] << ")\n";
 #endif
 
                 int thickness = std::max(frame->rows / 200, 1);
