@@ -20,8 +20,7 @@ All rights reserved.
 #include "Camera.hxx"
 #include "MjpegServer.hxx"
 #include "TimeServer.hxx"
-
-const std::string RageVision::kVersion = "v0.1.0";
+#include "Constants.hxx"
 
 bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std::vector<double> *timestamps)
 {
@@ -65,12 +64,12 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std
 
             double error = -1;
 
-            if (tag->hamming > kMaxHamming)
+            if (tag->hamming > Constants::kMaxHamming)
                 goto PIPELINE_NEXT_TAG;
 
             apriltag_detection_info_t info;
             info.det = tag;
-            info.tagsize = kTagSize;
+            info.tagsize = Constants::kTagSize;
             info.fx = camera->fx();
             info.fy = camera->fy();
             info.cx = camera->cx();
@@ -79,7 +78,7 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std
             apriltag_pose_t pose;
             error = estimate_tag_pose(&info, &pose);
 
-            if (error <= kMaxError)
+            if (error <= Constants::kMaxError)
             {
                 double endTime = std::chrono::high_resolution_clock::now().time_since_epoch().count() / 1.0e9;
                 double latency = endTime - (timestamp + mSyncTime / 1.0e9);
@@ -166,8 +165,8 @@ RageVision::RageVision(std::string ip, int mjpegPort, int syncPort, int dataPort
         mCameras.push_back(std::make_shared<Camera>(camera));
 
     mTagDetector = apriltag_detector_create();
-    mTagDetector->nthreads = kTagThreads;
-    mTagDetector->quad_decimate = kTagDecimate;
+    mTagDetector->nthreads = Constants::kTagThreads;
+    mTagDetector->quad_decimate = Constants::kTagDecimate;
     mTagFamily = tag16h5_create();
     apriltag_detector_add_family(mTagDetector, mTagFamily);
 

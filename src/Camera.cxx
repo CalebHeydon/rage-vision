@@ -12,7 +12,7 @@ All rights reserved.
 #include <string>
 #include <chrono>
 
-Camera::Camera(int id) : mVideoCapture{id}
+Camera::Camera(int id, int width, int height, double fps) : mVideoCapture{id}
 {
     mId = id;
     mCalibrated = true;
@@ -22,6 +22,11 @@ Camera::Camera(int id) : mVideoCapture{id}
         std::cerr << "Camera " << mId << " not found\n";
         std::exit(-1);
     }
+
+    mVideoCapture.set(cv::CAP_PROP_FRAME_WIDTH, width);
+    mVideoCapture.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+    if (fps > 0)
+        mVideoCapture.set(cv::CAP_PROP_FPS, fps);
 
     std::stringstream filename;
     filename << "./camera" << mId << ".yml";

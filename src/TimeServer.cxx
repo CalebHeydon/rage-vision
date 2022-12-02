@@ -14,8 +14,10 @@ All rights reserved.
 #include <cstdlib>
 #include <chrono>
 #include <string>
+#include <iostream>
+#include <string.h>
 
-#include "RageVision.hxx"
+#include "Constants.hxx"
 
 TimeServer::TimeServer(int port, long *time, std::mutex *mutex)
 {
@@ -53,7 +55,7 @@ void TimeServer::run()
         std::exit(-1);
     }
 
-    if (listen(mServerFd, RageVision::kMjpegConnectionBacklog) == -1)
+    if (listen(mServerFd, Constants::kTimeConnectionBacklog) == -1)
     {
         std::cerr << "Unable to listen\n";
         close(mServerFd);
@@ -70,20 +72,20 @@ void TimeServer::run()
                                if (clientFd == -1)
                                    continue;
 
-                               char *buffer = new char[RageVision::kTimeBufferSize];
+                               char *buffer = new char[Constants::kTimeBufferSize];
                                if (!buffer)
                                {
                                    std::cerr << "Out of memory\n";
                                    close(clientFd);
                                    return;
                                }
-                               memset(buffer, 0, RageVision::kTimeBufferSize);
+                               memset(buffer, 0, Constants::kTimeBufferSize);
 
                                long time = -1;
                                int bytesRead = 0;
-                               while (bytesRead < RageVision::kTimeBufferSize - 1 && buffer[bytesRead == 0 ? 0 : bytesRead - 1] != '\n')
+                               while (bytesRead < Constants::kTimeBufferSize - 1 && buffer[bytesRead == 0 ? 0 : bytesRead - 1] != '\n')
                                {
-                                   int tmp = read(clientFd, buffer + bytesRead, RageVision::kTimeBufferSize - 1 - bytesRead);
+                                   int tmp = read(clientFd, buffer + bytesRead, Constants::kTimeBufferSize - 1 - bytesRead);
                                    if (time == -1)
                                        time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 

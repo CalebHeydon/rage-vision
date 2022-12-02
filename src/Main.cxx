@@ -8,12 +8,13 @@ All rights reserved.
 #include <cstdlib>
 #include <vector>
 
+#include "Constants.hxx"
 #include "Calibration.hxx"
 #include "RageVision.hxx"
 
 int main(int argc, char **argv)
 {
-    std::cout << "RageVision " << RageVision::kVersion << "\n";
+    std::cout << "RageVision " << Constants::kVersion << "\n";
     std::cout << "Copyright (c) 2022, Caleb Heydon\n";
     std::cout << "All rights reserved.\n\n";
 
@@ -29,7 +30,7 @@ int main(int argc, char **argv)
     if (name.find("Calibrate") != -1)
     {
         int width, height;
-        int mjpegPort = RageVision::kDefaultMjpegPort;
+        int mjpegPort = Constants::kDefaultMjpegPort;
         int camera = 0;
 
         if (argc < 3)
@@ -58,9 +59,9 @@ int main(int argc, char **argv)
     }
 
     std::string ip{argv[1]};
-    int mjpegPort = RageVision::kDefaultMjpegPort;
-    int syncPort = RageVision::kDefaultTimePort;
-    int dataPort = RageVision::kDefaultDataPort;
+    int mjpegPort = Constants::kDefaultMjpegPort;
+    int syncPort = Constants::kDefaultTimePort;
+    int dataPort = Constants::kDefaultDataPort;
     std::vector<int> cameras;
 
     if (argc > 2)

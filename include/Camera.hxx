@@ -7,6 +7,8 @@ All rights reserved.
 
 #include <opencv2/opencv.hpp>
 
+#include "Constants.hxx"
+
 class Camera
 {
 private:
@@ -17,7 +19,7 @@ private:
     cv::Mat mDistCoeffs;
 
 public:
-    Camera(int id);
+    Camera(int id, int width = Constants::kDefaultFrameWidth, int height = Constants::kDefaultFrameHeight, double fps = -1.0);
 
     int id();
     double currentFrame(cv::Mat *frame, long startTime = 0);
