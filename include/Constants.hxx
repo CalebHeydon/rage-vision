@@ -15,7 +15,7 @@ public:
     static const int kMaxHamming = 0;
     static constexpr double kMaxError = 0.001;
     static constexpr double kTagSize = 0.1524;
-    static const int kTagThreads = 4;
+    static const int kTagThreads = 2;
     static constexpr float kTagDecimate = 2.0f;
     static const int kTimeBufferSize = 2048;
     static const int kDefaultFrameWidth = 640;
