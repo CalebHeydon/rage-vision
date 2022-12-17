@@ -12,9 +12,9 @@ All rights reserved.
 #include <string>
 #include <chrono>
 
-Camera::Camera(int id, int width, int height, double fps) : mVideoCapture{id}
+Camera::Camera(CameraInfo cameraInfo) : mVideoCapture{cameraInfo.mId}
 {
-    mId = id;
+    mId = cameraInfo.mId;
     mCalibrated = true;
 
     if (!mVideoCapture.isOpened())
@@ -23,13 +23,13 @@ Camera::Camera(int id, int width, int height, double fps) : mVideoCapture{id}
         std::exit(-1);
     }
 
-    mVideoCapture.set(cv::CAP_PROP_FRAME_WIDTH, width);
-    mVideoCapture.set(cv::CAP_PROP_FRAME_HEIGHT, height);
-    if (fps > 0)
-        mVideoCapture.set(cv::CAP_PROP_FPS, fps);
+    mVideoCapture.set(cv::CAP_PROP_FRAME_WIDTH, cameraInfo.mWidth);
+    mVideoCapture.set(cv::CAP_PROP_FRAME_HEIGHT, cameraInfo.mHeight);
+    if (cameraInfo.mFps > 0)
+        mVideoCapture.set(cv::CAP_PROP_FPS, cameraInfo.mFps);
 
     std::stringstream filename;
-    filename << "./camera" << mId << ".yml";
+    filename << "./camera" << mId << "_" << cameraInfo.mWidth << "x" << cameraInfo.mHeight << ".yml";
     cv::FileStorage file{filename.str(), cv::FileStorage::READ};
     if (!file.isOpened())
     {
@@ -37,8 +37,10 @@ Camera::Camera(int id, int width, int height, double fps) : mVideoCapture{id}
         return;
     }
 
-    file["cameraMatrix"] >> mCameraMatrix;
-    file["distCoeffs"] >> mDistCoeffs;
+    file["fx"] >> mFx;
+    file["fy"] >> mFy;
+    file["cx"] >> mCx;
+    file["cy"] >> mCy;
 
     file.release();
 }
@@ -79,30 +81,20 @@ bool Camera::calibrated()
 
 double Camera::fx()
 {
-    return mCameraMatrix.at<double>(cv::Point{0, 0});
+    return mFx;
 }
 
 double Camera::fy()
 {
-    return mCameraMatrix.at<double>(cv::Point{1, 1});
+    return mFy;
 }
 
 double Camera::cx()
 {
-    return mCameraMatrix.at<double>(cv::Point{0, 2});
+    return mCx;
 }
 
 double Camera::cy()
 {
-    return mCameraMatrix.at<double>(cv::Point{1, 2});
-}
-
-const cv::Mat Camera::cameraMatrix()
-{
-    return mCameraMatrix;
-}
-
-const cv::Mat Camera::distCoeffs()
-{
-    return mDistCoeffs;
+    return mCy;
 }

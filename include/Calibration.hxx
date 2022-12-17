@@ -11,21 +11,14 @@ All rights reserved.
 #include <memory>
 
 #include "Camera.hxx"
-#include "MjpegServer.hxx"
 
 class Calibration
 {
 private:
-    Camera mCamera;
-    cv::Size mCheckerboardSize;
-    std::atomic<bool> mRunning;
-    cv::Mat mFrame;
-    std::atomic<bool> mFrameLock;
-    cv::Size mSize;
-    std::shared_ptr<MjpegServer> mMjpegServer;
+    Camera::CameraInfo mCamera;
 
 public:
-    Calibration(int camera, int width, int height, int mjpegPort);
+    Calibration(Camera::CameraInfo camera);
 
     int run();
 };

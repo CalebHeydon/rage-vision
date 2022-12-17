@@ -156,12 +156,12 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std
     return true;
 }
 
-RageVision::RageVision(std::string ip, int mjpegPort, int syncPort, int dataPort, std::vector<int> cameras)
+RageVision::RageVision(std::string ip, int mjpegPort, int syncPort, int dataPort, std::vector<Camera::CameraInfo> cameras)
 {
     mIp = ip;
     mMjpegServer = std::make_shared<MjpegServer>(mjpegPort);
 
-    for (int camera : cameras)
+    for (Camera::CameraInfo camera : cameras)
         mCameras.push_back(std::make_shared<Camera>(camera));
 
     mTagDetector = apriltag_detector_create();

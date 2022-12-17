@@ -15,11 +15,35 @@ private:
     cv::VideoCapture mVideoCapture;
     int mId;
     bool mCalibrated;
-    cv::Mat mCameraMatrix;
-    cv::Mat mDistCoeffs;
+    double mFx;
+    double mFy;
+    double mCx;
+    double mCy;
 
 public:
-    Camera(int id, int width = Constants::kDefaultFrameWidth, int height = Constants::kDefaultFrameHeight, double fps = -1.0);
+    typedef struct CameraInfo
+    {
+        int mId, mWidth, mHeight;
+        double mFps;
+
+        CameraInfo()
+        {
+            mId = 0;
+            mWidth = Constants::kDefaultFrameWidth;
+            mHeight = Constants::kDefaultFrameHeight;
+            mFps = -1.0;
+        }
+
+        CameraInfo(int id, int width, int height, double fps)
+        {
+            mId = id;
+            mWidth = width;
+            mHeight = height;
+            mFps = fps;
+        }
+    } CameraInfo;
+
+    Camera(CameraInfo cameraInfo);
 
     int id();
     double currentFrame(cv::Mat *frame, long startTime = 0);
@@ -29,6 +53,4 @@ public:
     double fy();
     double cx();
     double cy();
-    const cv::Mat cameraMatrix();
-    const cv::Mat distCoeffs();
 };

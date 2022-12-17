@@ -13,8 +13,8 @@ All rights reserved.
 #include <opencv2/opencv.hpp>
 
 #include "MjpegServer.hxx"
-#include "Camera.hxx"
 #include "TimeServer.hxx"
+#include "Camera.hxx"
 
 class RageVision
 {
@@ -31,7 +31,7 @@ private:
     bool runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std::vector<double> *timestamps);
 
 public:
-    RageVision(std::string ip, int mjpegPort, int syncPort, int dataPort, std::vector<int> cameras);
+    RageVision(std::string ip, int mjpegPort, int syncPort, int dataPort, std::vector<Camera::CameraInfo> cameras);
     ~RageVision();
 
     int run();
