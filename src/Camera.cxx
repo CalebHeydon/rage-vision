@@ -10,6 +10,7 @@ All rights reserved.
 #include <sstream>
 #include <opencv2/opencv.hpp>
 #include <string>
+#include <cstdint>
 #include <chrono>
 
 Camera::Camera(CameraInfo cameraInfo) : mVideoCapture{cameraInfo.mId}
@@ -50,9 +51,9 @@ int Camera::id()
     return mId;
 }
 
-double Camera::currentFrame(cv::Mat *frame, long startTime)
+double Camera::currentFrame(cv::Mat *frame, uint64_t startTime)
 {
-    long time;
+    uint64_t time;
     while (true)
     {
         if (!mVideoCapture.grab())

@@ -9,6 +9,7 @@ All rights reserved.
 #include <memory>
 #include <vector>
 #include <apriltag/apriltag.h>
+#include <cstdint>
 #include <mutex>
 #include <opencv2/opencv.hpp>
 
@@ -24,7 +25,7 @@ private:
     std::vector<std::shared_ptr<Camera>> mCameras;
     apriltag_detector_t *mTagDetector;
     apriltag_family_t *mTagFamily;
-    long mSyncTime;
+    uint64_t mSyncTime;
     std::mutex mSyncTimeMutex;
     std::shared_ptr<TimeServer> mTimeServer;
 

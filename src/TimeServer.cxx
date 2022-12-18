@@ -5,6 +5,7 @@ All rights reserved.
 
 #include "TimeServer.hxx"
 
+#include <cstdint>
 #include <mutex>
 #include <signal.h>
 #include <sys/socket.h>
@@ -19,7 +20,7 @@ All rights reserved.
 
 #include "Constants.hxx"
 
-TimeServer::TimeServer(int port, long *time, std::mutex *mutex)
+TimeServer::TimeServer(int port, uint64_t *time, std::mutex *mutex)
 {
     mPort = port;
     mTime = time;
@@ -81,7 +82,7 @@ void TimeServer::run()
                                }
                                memset(buffer, 0, Constants::kTimeBufferSize);
 
-                               long time = -1;
+                               uint64_t time = -1;
                                int bytesRead = 0;
                                while (bytesRead < Constants::kTimeBufferSize - 1 && buffer[bytesRead == 0 ? 0 : bytesRead - 1] != '\n')
                                {

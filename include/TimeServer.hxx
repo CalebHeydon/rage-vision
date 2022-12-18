@@ -5,22 +5,22 @@ All rights reserved.
 
 #pragma once
 
+#include <cstdint>
 #include <mutex>
 #include <thread>
 #include <atomic>
-#include <memory>
 
 class TimeServer
 {
 private:
     int mPort;
-    long *mTime;
+    uint64_t *mTime;
     std::mutex *mMutex;
     int mServerFd;
     std::atomic<bool> mRunning;
 
 public:
-    TimeServer(int port, long *time, std::mutex *mutex);
+    TimeServer(int port, uint64_t *time, std::mutex *mutex);
 
     void run();
     void stop();

@@ -6,6 +6,7 @@ All rights reserved.
 #pragma once
 
 #include <opencv2/opencv.hpp>
+#include <cstdint>
 
 #include "Constants.hxx"
 
@@ -46,7 +47,7 @@ public:
     Camera(CameraInfo cameraInfo);
 
     int id();
-    double currentFrame(cv::Mat *frame, long startTime = 0);
+    double currentFrame(cv::Mat *frame, uint64_t startTime = 0);
     void release();
     bool calibrated();
     double fx();
