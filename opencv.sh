@@ -7,12 +7,9 @@ apk add zlib libjpeg-turbo libwebp libpng libtiff openjpeg gstreamer ffmpeg v4l-
 apk add zlib-devel libjpeg-turbo-devel libwebp-devel libpng-devel libtiff-devel openjpeg-devel gstreamer-devel ffmpeg-devel gst-plugins-base-devel v4l-utils-devel vulkan-tools
 apk add curl clang lld cmake ninja python
 
-#curl -L https://github.com/opencv/opencv/archive/refs/tags/4.7.0.tar.gz -o opencv.tar.gz
-#tar -xf opencv.tar.gz
-#mv opencv-* opencv
-#cd opencv
-
-git clone https://github.com/opencv/opencv.git
+curl -L https://github.com/opencv/opencv/archive/refs/tags/4.7.0.tar.gz -o opencv.tar.gz
+tar -xf opencv.tar.gz
+mv opencv-* opencv
 cd opencv
 
 # See https://www.simonwenkel.com/notes/software_libraries/opencv/compiling-opencv.html
