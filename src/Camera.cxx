@@ -21,7 +21,7 @@ Camera::Camera(CameraInfo cameraInfo) : mVideoCapture{cameraInfo.mId}
     if (!mVideoCapture.isOpened())
     {
         std::cerr << "Camera " << mId << " not found\n";
-        std::exit(-1);
+        exit(-1);
     }
 
     mVideoCapture.set(cv::CAP_PROP_FRAME_WIDTH, cameraInfo.mWidth);

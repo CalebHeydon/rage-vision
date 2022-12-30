@@ -37,7 +37,7 @@ void MjpegServer::run()
     if (mServerFd == -1)
     {
         std::cerr << "Unable to open tcp socket\n";
-        std::exit(-1);
+        exit(-1);
     }
 
     int opt = 1;
@@ -54,14 +54,14 @@ void MjpegServer::run()
     {
         std::cerr << "Unable to bind to port\n";
         close(mServerFd);
-        std::exit(-1);
+        exit(-1);
     }
 
     if (listen(mServerFd, Constants::kMjpegConnectionBacklog) == -1)
     {
         std::cerr << "Unable to listen\n";
         close(mServerFd);
-        std::exit(-1);
+        exit(-1);
     }
 
     std::thread thread{[this]

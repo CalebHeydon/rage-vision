@@ -23,13 +23,13 @@ UdpSender::UdpSender(int port)
     if (mSocket == -1)
     {
         std::cerr << "Unable to open udp socket\n";
-        std::exit(-1);
+        exit(-1);
     }
 
     if (int flags = fcntl(mSocket, F_GETFL, 0) == -1 || fcntl(mSocket, F_SETFL, flags | O_NONBLOCK) == -1)
     {
         std::cerr << "Unable to make udp socket non-blocking\n";
-        std::exit(-1);
+        exit(-1);
     }
 }
 
