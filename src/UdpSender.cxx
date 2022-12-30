@@ -25,12 +25,6 @@ UdpSender::UdpSender(int port)
         std::cerr << "Unable to open udp socket\n";
         exit(-1);
     }
-
-    if (int flags = fcntl(mSocket, F_GETFL, 0) == -1 || fcntl(mSocket, F_SETFL, flags | O_NONBLOCK) == -1)
-    {
-        std::cerr << "Unable to make udp socket non-blocking\n";
-        exit(-1);
-    }
 }
 
 UdpSender::~UdpSender()
