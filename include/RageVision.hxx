@@ -16,6 +16,7 @@ All rights reserved.
 #include "MjpegServer.hxx"
 #include "TimeServer.hxx"
 #include "Camera.hxx"
+#include "UdpSender.hxx"
 
 class RageVision
 {
@@ -28,6 +29,7 @@ private:
     uint64_t mSyncTime;
     std::mutex mSyncTimeMutex;
     std::shared_ptr<TimeServer> mTimeServer;
+    std::shared_ptr<UdpSender> mUdpSender;
 
     bool runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std::vector<double> *timestamps);
 
