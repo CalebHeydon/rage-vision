@@ -19,6 +19,7 @@ All rights reserved.
 #include <cstdlib>
 #include <algorithm>
 #include <opencv2/opencv.hpp>
+#include <vector>
 #include <sstream>
 
 #include "Constants.hxx"
@@ -207,7 +208,10 @@ void MjpegServer::run()
                                         cv::line(frame, cv::Point{frame.cols / 2, frame.rows / 2 - frame.cols / 10}, cv::Point{frame.cols / 2, frame.rows / 2 - frame.cols / 30}, cv::Scalar{0, 255, 0}, thickness);
                                         cv::line(frame, cv::Point{frame.cols / 2, frame.rows / 2 + frame.cols / 30}, cv::Point{frame.cols / 2, frame.rows / 2 + frame.cols / 10}, cv::Scalar{0, 255, 0}, thickness);
 
-                                        cv::imencode(".jpg", frame, buffer);
+                                        std::vector<int> params{2};
+                                        params[0] = cv::IMWRITE_JPEG_QUALITY;
+                                        params[1] = Constants::kMjpegQuality;
+                                        cv::imencode(".jpg", frame, buffer, params);
 
                                         std::stringstream stringStream;
                                         stringStream << "boundary\r\nContent-Type: image/jpeg\r\nContent-Length: " << buffer.size() << "\r\n\r\n";
