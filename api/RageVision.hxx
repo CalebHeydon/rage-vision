@@ -47,7 +47,7 @@ private:
     static const int kBufferSize = 1024;
 
 public:
-    RageVision(int port, std::function<void(double timestamp, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency)> callback)
+    void run(int port, std::function<void(double timestamp, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency)> callback)
     {
         int bufferSize = kBufferSize;
 
