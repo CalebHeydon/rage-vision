@@ -62,7 +62,7 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std
             apriltag_detection_t *tag;
             zarray_get(tags, i, &tag);
 
-            double error = -1;
+            double error = -1.0;
 
             if (tag->hamming > Constants::kMaxHamming)
                 goto PIPELINE_NEXT_TAG;
@@ -84,8 +84,19 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std
                 double latency = endTime - (timestamp + mSyncTime / 1.0e9);
                 double processingLatency = endTime - startTime;
 
+                double translation[3];
+                translation[0] = MATD_EL(pose.t, 0, 0);
+                translation[1] = MATD_EL(pose.t, 1, 0);
+                translation[2] = MATD_EL(pose.t, 2, 0);
+
+                double rotation[4];
+                rotation[0] = sqrt(1.0 + MATD_EL(pose.R, 0, 0) + MATD_EL(pose.R, 1, 1) + MATD_EL(pose.R, 2, 2)) / 2.0;
+                rotation[1] = (MATD_EL(pose.R, 2, 1) - MATD_EL(pose.R, 1, 2)) / (4.0 * rotation[0]);
+                rotation[2] = (MATD_EL(pose.R, 0, 2) - MATD_EL(pose.R, 2, 0)) / (4.0 * rotation[0]);
+                rotation[3] = (MATD_EL(pose.R, 1, 0) - MATD_EL(pose.R, 0, 1)) / (4.0 * rotation[0]);
+
 #ifndef NDEBUG
-                std::cout << "fps: " << fps << ", latency: " << latency << ", processingLatency: " << processingLatency << ", id: " << tag->id << ", (" << pose.t->data[0] << ", " << pose.t->data[1] << ", " << pose.t->data[2] << ")\n";
+                std::cout << "fps: " << fps << ", latency: " << latency << ", processingLatency: " << processingLatency << ", id: " << tag->id << ", (" << translation[0] << ", " << translation[1] << ", " << translation[2] << "), (" << rotation[0] << ", " << rotation[1] << ", " << rotation[2] << ", " << rotation[3] << ")\n";
 #endif
 
                 int thickness = std::max(frame->rows / 200, 1);
@@ -167,6 +178,7 @@ RageVision::RageVision(std::string ip, int mjpegPort, int syncPort, int dataPort
     mTagDetector = apriltag_detector_create();
     mTagDetector->nthreads = Constants::kTagThreads;
     mTagDetector->quad_decimate = Constants::kTagDecimate;
+    mTagDetector->debug = 0;
     mTagFamily = tag16h5_create();
     apriltag_detector_add_family(mTagDetector, mTagFamily);
 
