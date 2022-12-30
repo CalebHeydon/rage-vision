@@ -22,30 +22,13 @@ All rights reserved.
 #include "TimeServer.hxx"
 #include "Constants.hxx"
 
-bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std::vector<double> *timestamps)
+bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, double *lastTimestamp)
 {
     mSyncTimeMutex.lock();
     double timestamp = camera->currentFrame(frame, mSyncTime);
     mSyncTimeMutex.unlock();
-    double fps = 0;
-
-    if (timestamps->size() > 1)
-    {
-        if (timestamps->at(0) < timestamp - 1)
-        {
-            int i;
-            for (i = 0; i < timestamps->size() && timestamps->at(i) < timestamp - 1; i++)
-                ;
-
-            for (int j = 0; j < i - 1; j++)
-                timestamps->erase(timestamps->begin() + j);
-        }
-
-        double timeElapsed = timestamps->at(timestamps->size() - 1) - timestamps->at(0);
-        fps = timestamps->size() / timeElapsed;
-    }
-
-    timestamps->push_back(timestamp);
+    double fps = 1.0 / (timestamp - *lastTimestamp);
+    *lastTimestamp = timestamp;
 
     if (camera->calibrated())
     {
@@ -208,9 +191,9 @@ int RageVision::run()
         std::thread thread{[this, camera]
                            {
                                cv::Mat frame;
-                               std::vector<double> timestamps;
+                               double lastTimestamp = 0;
 
-                               while (runPipeline(&frame, camera, &timestamps))
+                               while (runPipeline(&frame, camera, &lastTimestamp))
                                    ;
                            }};
         thread.detach();
@@ -218,9 +201,9 @@ int RageVision::run()
 
     std::shared_ptr<Camera> camera = mCameras[0];
     cv::Mat frame;
-    std::vector<double> timestamps;
+    double lastTimestamp = 0;
 
-    while (runPipeline(&frame, camera, &timestamps))
+    while (runPipeline(&frame, camera, &lastTimestamp))
         ;
 
     return 0;

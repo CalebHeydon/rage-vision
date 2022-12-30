@@ -31,7 +31,7 @@ private:
     std::shared_ptr<TimeServer> mTimeServer;
     std::shared_ptr<UdpSender> mUdpSender;
 
-    bool runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, std::vector<double> *timestamps);
+    bool runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, double *lastTimestamp);
 
 public:
     RageVision(std::string ip, int mjpegPort, int syncPort, int dataPort, std::vector<Camera::CameraInfo> cameras);
