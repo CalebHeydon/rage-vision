@@ -9,7 +9,7 @@ public:
     static const int kHttpBufferSize = 4096;
     static const int kDefaultMjpegPort = 5800;
     static const int kMjpegConnectionBacklog = 128;
-    static const int kMjpegQuality = 50;
+    static const int kMjpegQuality = 25;
     static const int kTimeConnectionBacklog = 128;
     static const int kDefaultTimePort = 5801;
     static const int kDefaultDataPort = 5800;
