@@ -144,7 +144,7 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, dou
     int textX = height, textY = frame->rows - height;
 
     std::stringstream fpsText;
-    fpsText.precision(1);
+    fpsText.precision(3);
     fpsText << fps;
     cv::putText(*frame, fpsText.str(), cv::Point{textX, textY}, cv::FONT_HERSHEY_PLAIN, scale, cv::Scalar{0, 255, 0}, thickness);
 
