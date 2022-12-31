@@ -29,17 +29,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include <functional>
+
+#ifndef _WIN32
 #include <thread>
-#include <sys/socket.h>
 #include <iostream>
 #include <cstring>
-#include <arpa/inet.h>
-#include <cstdint>
 #include <string>
-#include <cstddef>
 #include <cstdlib>
-#include <unistd.h>
 #include <sstream>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <cstddef>
+#include <unistd.h>
+#endif
 
 class RageVision
 {
@@ -47,8 +49,44 @@ private:
     static const int kBufferSize = 1024;
 
 public:
+    int sync(std::string ip, double timestamp, int port = 5801)
+    {
+#ifndef _WIN32
+        int fd = socket(AF_INET, SOCK_STREAM, 0);
+        if (fd == -1)
+            return -1;
+
+        struct sockaddr_in serverAddress;
+        memset(&serverAddress, 0, sizeof(serverAddress));
+
+        serverAddress.sin_family = AF_INET;
+        serverAddress.sin_port = htons(port);
+        serverAddress.sin_addr.s_addr = inet_addr(ip.c_str());
+
+        if (connect(fd, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
+        {
+            close(fd);
+            return -1;
+        }
+
+        std::stringstream stringStream;
+        stringStream << timestamp << "\n";
+        std::string data = stringStream.str();
+
+        if (send(fd, data.c_str(), data.size(), 0) == -1)
+        {
+            close(fd);
+            return -1;
+        }
+
+        close(fd);
+#endif
+        return 0;
+    }
+
     void run(int port, std::function<void(double timestamp, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency)> callback)
     {
+#ifndef _WIN32
         int bufferSize = kBufferSize;
 
         std::thread thread{[port, bufferSize, callback]
@@ -57,7 +95,7 @@ public:
                                if (fd == -1)
                                {
                                    std::cerr << "Unable to open tcp socket\n";
-                                   std::exit(-1);
+                                   exit(-1);
                                }
 
                                struct sockaddr_in serverAddress;
@@ -70,14 +108,14 @@ public:
                                if (bind(fd, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
                                {
                                    std::cerr << "Unable to bind to port\n";
-                                   std::exit(-1);
+                                   exit(-1);
                                }
 
-                               uint8_t *buffer = new uint8_t[bufferSize];
+                               char *buffer = new char[bufferSize];
                                if (!buffer)
                                {
                                    std::cerr << "Out of memory\n";
-                                   std::exit(-1);
+                                   exit(-1);
                                }
 
                                while (true)
@@ -87,7 +125,7 @@ public:
 
                                    std::string data{(const char *)buffer};
 
-                                   size_t i = data.find(":");
+                                   ssize_t i = data.find(":");
                                    if (i == -1)
                                        continue;
                                    std::string number = data.substr(0, i);
@@ -156,38 +194,6 @@ public:
                                }
                            }};
         thread.detach();
-    }
-
-    int sync(std::string ip, double timestamp, int port = 5801)
-    {
-        int fd = socket(AF_INET, SOCK_STREAM, 0);
-        if (fd == -1)
-            return -1;
-
-        struct sockaddr_in serverAddress;
-        memset(&serverAddress, 0, sizeof(serverAddress));
-
-        serverAddress.sin_family = AF_INET;
-        serverAddress.sin_port = htons(port);
-        serverAddress.sin_addr.s_addr = inet_addr(ip.c_str());
-
-        if (connect(fd, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
-        {
-            close(fd);
-            return -1;
-        }
-
-        std::stringstream stringStream;
-        stringStream << timestamp << "\n";
-        std::string data = stringStream.str();
-
-        if (send(fd, data.c_str(), data.size(), 0) == -1)
-        {
-            close(fd);
-            return -1;
-        }
-
-        close(fd);
-        return 0;
+#endif
     }
 };
