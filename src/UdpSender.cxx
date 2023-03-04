@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2022, Caleb Heydon
+Copyright (c) 2023, Caleb Heydon
 All rights reserved.
 */
 
@@ -32,10 +32,11 @@ UdpSender::~UdpSender()
     close(mSocket);
 }
 
-void UdpSender::send(std::string address, double timestamp, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency)
+void UdpSender::send(std::string address, int camera, double timestamp, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency)
 {
     std::stringstream stringStream;
     stringStream.precision(17);
+    stringStream << camera << ":";
     stringStream << timestamp << ":";
     stringStream << id << ":";
     stringStream << tx << ":" << ty << ":" << tz << ":";

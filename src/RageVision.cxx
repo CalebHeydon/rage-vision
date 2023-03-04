@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2022, Caleb Heydon
+Copyright (c) 2023, Caleb Heydon
 All rights reserved.
 */
 
@@ -78,7 +78,7 @@ bool RageVision::runPipeline(cv::Mat *frame, std::shared_ptr<Camera> camera, dou
                 rotation[2] = (MATD_EL(pose.R, 0, 2) - MATD_EL(pose.R, 2, 0)) / (4.0 * rotation[0]);
                 rotation[3] = (MATD_EL(pose.R, 1, 0) - MATD_EL(pose.R, 0, 1)) / (4.0 * rotation[0]);
 
-                mUdpSender->send(mIp, timestamp, tag->id, translation[0], translation[1], translation[2], rotation[0], rotation[1], rotation[2], rotation[3], processingLatency);
+                mUdpSender->send(mIp, camera->id(), timestamp, tag->id, translation[0], translation[1], translation[2], rotation[0], rotation[1], rotation[2], rotation[3], processingLatency);
 
 #ifndef NDEBUG
                 std::cout << "fps: " << fps << ", latency: " << latency << ", processingLatency: " << processingLatency << ", id: " << tag->id << ", (" << translation[0] << ", " << translation[1] << ", " << translation[2] << "), (" << rotation[0] << ", " << rotation[1] << ", " << rotation[2] << ", " << rotation[3] << ")\n";

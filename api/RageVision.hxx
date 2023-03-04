@@ -84,7 +84,7 @@ public:
         return 0;
     }
 
-    void run(int port, std::function<void(double timestamp, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency)> callback)
+    void run(int port, std::function<void(double timestamp, int camera, int id, double tx, double ty, double tz, double qw, double qx, double qy, double qz, double processingLatency)> callback)
     {
 #ifndef _WIN32
         int bufferSize = kBufferSize;
@@ -131,6 +131,13 @@ public:
                                    std::string number = data.substr(0, i);
                                    data = data.substr(i + 1, data.size() - i);
                                    double timestamp = atof(number.c_str());
+
+                                   i = data.find(":");
+                                   if (i == -1)
+                                       continue;
+                                   number = data.substr(0, i);
+                                   data = data.substr(i + 1, data.size() - i);
+                                   int camera = atoi(number.c_str());
 
                                    i = data.find(":");
                                    if (i == -1)
@@ -190,7 +197,7 @@ public:
 
                                    double processingLatency = atof(data.c_str());
 
-                                   callback(timestamp, id, tx, ty, tz, qw, qx, qy, qz, processingLatency);
+                                   callback(timestamp, camera, id, tx, ty, tz, qw, qx, qy, qz, processingLatency);
                                }
                            }};
         thread.detach();

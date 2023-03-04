@@ -2,4 +2,4 @@
 
 #include <string>
 
-const std::string Constants::kVersion = "v0.1.0";
+const std::string Constants::kVersion = "v0.1.1";
